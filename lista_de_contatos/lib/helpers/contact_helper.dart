@@ -29,11 +29,11 @@ class ContactHelper{
 
   Future<Database>initDb() async {
     final databasesPath = await getDatabasesPath();
-    final path = join(databasesPath, "contacts.db");
+    final path = join(databasesPath, "contactsnew.db");
 
     return await openDatabase(path, version: 1, onCreate: (Database db, int newerVersion) async{
       await db.execute(
-        "CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT"
+        "CREATE TABLE $contactTable($idColumn INTEGER PRIMARY KEY, $nameColumn TEXT, $emailColumn TEXT,"
         "$phoneColumn TEXT, $imgColumn TEXT)"
       );
     }); 
@@ -59,17 +59,17 @@ class ContactHelper{
       }
   }
 
-  Future<int> deleteContact(int id) async{
+  Future<int> deleteContact(int id) async {
     Database dbContact = await db;
     return await dbContact.delete(contactTable, where: "$idColumn = ?", whereArgs: [id]);
   }
 
-  Future<int> updateContact(Contact contact) async{
+  Future<int> updateContact(Contact contact) async {
     Database dbContact = await db;
     return await dbContact.update(contactTable, contact.toMap(), where: "$idColumn = ?", whereArgs: [contact.id]);
   }
 
-  Future<List> getAllContacts() async{
+  Future<List> getAllContacts() async {
     Database dbContact = await db;
     List listMap = await dbContact.rawQuery("SELECT * FROM $contactTable");
     List<Contact> listContact = List();
@@ -79,12 +79,12 @@ class ContactHelper{
     return listContact;
   }
 
-  Future<int> getNumber() async{
+  Future<int> getNumber() async {
     Database dbContact = await db;
     return Sqflite.firstIntValue(await dbContact.rawQuery("SELECT COUNT(*) FROM $contactTable"));
   }
 
-  Future close() async{
+  Future close() async {
     Database dbContact = await db;
     dbContact.close();
   }
@@ -98,6 +98,8 @@ class Contact {
   String email;
   String phone;
   String img;
+
+  Contact();
 
   Contact.fromMap(Map map){
     id = map[idColumn];
