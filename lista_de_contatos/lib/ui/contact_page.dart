@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ class _ContactPageState extends State<ContactPage> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
+
+  final _nameFocus = FocusNode();
 
   bool _userEdited = false;
   Contact _editedContact;
@@ -40,14 +43,22 @@ class _ContactPageState extends State<ContactPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: _requestPop,
+      child: Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
         title: Text(_editedContact.name ?? "Novo Contato"),
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){},
+        onPressed: (){
+          if (_editedContact.name != null && _editedContact.name.isNotEmpty) {
+            Navigator.pop(context, _editedContact);
+          } else {
+            FocusScope.of(context).requestFocus(_nameFocus);
+          }
+        },
         child: Icon(Icons.save),
         backgroundColor: Colors.red,
         ),
@@ -69,6 +80,7 @@ class _ContactPageState extends State<ContactPage> {
             ),
             TextField(
               controller: nameController,
+              focusNode: _nameFocus,
               decoration: InputDecoration(labelText: "Nome"),
               onChanged: (text){
                 _userEdited = true;
@@ -98,6 +110,39 @@ class _ContactPageState extends State<ContactPage> {
           ],
         ),
       ),
+    ),
     );
+  }
+
+  Future<bool>_requestPop(){
+    if (_userEdited) {
+      showDialog(
+        context: context,
+        builder: (context){
+          return AlertDialog(
+            title: Text("Descartar Alterações?"),
+            content: Text("Se sair as alterações serão todas perdidas..."),
+            actions: <Widget>[
+              FlatButton(
+               onPressed: (){
+                 Navigator.pop(context);
+               }, 
+               child: Text("Cancelar")
+              ),
+              FlatButton(
+                onPressed: (){
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                }, 
+                child: Text("Sim")
+              ),
+            ],
+          );
+        }
+      );
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    } 
   }
 }
