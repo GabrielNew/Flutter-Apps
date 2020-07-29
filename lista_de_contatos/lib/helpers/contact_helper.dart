@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -19,7 +21,7 @@ class ContactHelper{
   Database _db;
 
   Future<Database>get db async{
-    if(db != null){
+    if(_db != null){
       return _db;
     } else {
       _db = await initDb();
