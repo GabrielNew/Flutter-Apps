@@ -5,6 +5,8 @@ import 'package:lista_de_contatos/helpers/contact_helper.dart';
 import 'package:lista_de_contatos/ui/contact_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+enum OrderOptions {AZ, ZA}
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -30,6 +32,21 @@ class _HomePageState extends State<HomePage> {
         title: Text("Contatos"),
         backgroundColor: Colors.red,
         centerTitle: true,
+        actions: <Widget>[
+          PopupMenuButton<OrderOptions>(
+            itemBuilder: (context) => <PopupMenuEntry<OrderOptions>>[
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Ordernar de A-Z"),
+                value: OrderOptions.AZ,
+              ),
+              const PopupMenuItem<OrderOptions>(
+                child: Text("Ordernar de Z-A"),
+                value: OrderOptions.ZA,
+              )
+            ],
+            onSelected: _orderList,
+          )
+        ],
       ),
       backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(
@@ -63,6 +80,7 @@ class _HomePageState extends State<HomePage> {
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     image: contacts[index].img != null ? FileImage(File(contacts[index].img)): AssetImage("assets/person.png"),
+                   fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -176,6 +194,25 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         contacts = list;  
       });
+    });
+  }
+
+  void _orderList(OrderOptions result){
+    switch (result) {
+      case OrderOptions.AZ:
+        contacts.sort((a,b){
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        });
+        break;
+      case OrderOptions.ZA:
+        contacts.sort((a,b){
+          return b.name.toLowerCase().compareTo(a.name.toLowerCase());
+        });
+        break;
+      default:
+    }
+    setState(() {
+      
     });
   }
 }
